@@ -1,0 +1,9 @@
+# renut-nx-webinstaller: local tooling and caches (game data never belongs here)
+.claude/
+__pycache__/
+*.log
+node_modules/
+# build folders, downloaded archives and test outputs (translated game shaders stay local)
+wasm/src/*/build/
+vendor/*.tar.bz2
+test/out_*

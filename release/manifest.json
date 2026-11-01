@@ -1,0 +1,31 @@
+{
+  "version": 1,
+  "builds": [
+    {
+      "edition": "Xbox 360 disc, title update 3",
+      "xex_sha256": "cfc2ecf323d7d8d1d6a6b871f424387f89f1136128fe0ca4f6e6e71c5838d07e",
+      "xexp_sha256": "7f0363e93ea717489f817861e70403fbe0dd3be271eb97260e2f7d118bdd528c",
+      "nro": "renut-nx.nro",
+      "nro_sha256": "582b5f155564934057fefb10f183e16a6ea68aeebde61cddfc349b1dc3f2f80a",
+      "files": [
+        {
+          "path": "renut.toml",
+          "source": "renut.toml",
+          "sha256": "b38845d7729eb1fbeccb647a15f5de10700e42134a76cf6811624d86a65a5359"
+        },
+        {
+          "path": "pipeline_list.bin",
+          "source": "pipeline_list.bin",
+          "sha256": "f2027cd755f775d452922c22a910615a464f29c22ff8a4419761e26d52d86760"
+        },
+        {
+          "path": "deko3d_glsl.dict",
+          "source": "deko3d_glsl.dict",
+          "sha256": "ed54a492bddb4c60d0a01f7e6b0f4dbff2062499456a1eb855bdd0df13e2ac48"
+        }
+      ],
+      "deko3d_glsl_sha256": "1796c0325d5e2e00096a15d49d6b46c1cc13008d4a7e7e1a01fa7ed7f172a316",
+      "deko3d_shaders_sha256": "a80f4d2424ad64ca561892da45b4c3543d4f4b8d13d0342f690a08c64d9888c7"
+    }
+  ]
+}
