@@ -24,7 +24,7 @@ uploaded, and no game data comes with renut-nx.
    version.
 3. **Choose title update 3** (and the DLC package, at the same time, if you have it).
 4. Press **Create renut-nx.zip**. The page makes the game's shaders and compiles them for the Switch: this takes a
-   while (10 to 30 minutes, depending on your computer). The zip downloads while it is made; keep the page open until it
+   while (20 to 40 minutes, depending on your computer). The zip downloads while it is made; keep the page open until it
    finishes.
 5. Extract `renut-nx.zip` to the **root of the SD card**. It makes `switch/renut-nx/`.
 6. On the Switch, open **Sphaira**, find Banjo-Kazooie Nuts & Bolts, press **X** to open Options and choose
