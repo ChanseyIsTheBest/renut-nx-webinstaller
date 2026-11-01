@@ -19,7 +19,7 @@ uploaded, and no game data comes with renut-nx.
 
 ## How to use it
 
-1. Open the page.
+1. Open the page: **https://chanseyisthebest.github.io/renut-nx-webinstaller/**
 2. **Choose your game**: the disc image (`.iso`) or the extracted folder. The page checks that it is the supported
    version.
 3. **Choose title update 3** (and the DLC package, at the same time, if you have it).
