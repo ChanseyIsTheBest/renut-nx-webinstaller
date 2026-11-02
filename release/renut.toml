@@ -2,6 +2,12 @@
 # the NRO with the values the longer renut.toml of earlier packages had (2026-11-01), and any key from an older
 # renut.toml still works if you add it back.
 
+# ---- Language ----
+# The game's language. "system" follows the Switch's system language (English if the game has no text for it).
+# Or one of: "english", "french", "german", "spanish", "italian", "japanese", "korean", "tradchinese",
+# "simpchinese", "russian", "polish", "czech", "dutch", "norwegian", "swedish".
+language = "system"
+
 # ---- Picture ----
 # MSAA on the 3D scene: 0 = off, 2 = the game's own 2x (smoother edges, more GPU time).
 msaa_level = 0

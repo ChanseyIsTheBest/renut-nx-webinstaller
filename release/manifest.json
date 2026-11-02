@@ -6,12 +6,12 @@
       "xex_sha256": "cfc2ecf323d7d8d1d6a6b871f424387f89f1136128fe0ca4f6e6e71c5838d07e",
       "xexp_sha256": "7f0363e93ea717489f817861e70403fbe0dd3be271eb97260e2f7d118bdd528c",
       "nro": "renut-nx.nro",
-      "nro_sha256": "582b5f155564934057fefb10f183e16a6ea68aeebde61cddfc349b1dc3f2f80a",
+      "nro_sha256": "4b146792c92515403470645eba2a0dbf31dce9e3abd2f0c8c5edc3e4133776dd",
       "files": [
         {
           "path": "renut.toml",
           "source": "renut.toml",
-          "sha256": "b38845d7729eb1fbeccb647a15f5de10700e42134a76cf6811624d86a65a5359"
+          "sha256": "ab73575fe65a0a18796aa85ffbf9ba1e68d78208e06356cbf881ecda7922f840"
         },
         {
           "path": "pipeline_list.bin",

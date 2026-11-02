@@ -1,6 +1,6 @@
 # renut-nx-webinstaller
 
-Version 1.0.0, for **renut-nx 1.0.0**: Banjo-Kazooie: Nuts & Bolts on the Nintendo Switch (homebrew), by
+Version 1.0.1, for **renut-nx 1.0.1**: Banjo-Kazooie: Nuts & Bolts on the Nintendo Switch (homebrew), by
 ChanseyIsTheBest. renut-nx is a Switch port of [reNut](https://github.com/masterspike52/reNut).
 
 This page makes the Switch package from **your own copy** of the game. It runs entirely in your browser: nothing is
@@ -37,8 +37,8 @@ To run the page on your own computer: `python serve.py 8193 .` in this folder, t
 
 ## Settings
 
-`switch/renut-nx/renut.toml` holds the settings you may want to change, with a comment on each: MSAA and SMAA, the
-dynamic resolution (handheld 540p-720p, docked 540p-1080p), fur detail, 1.0.0's original font and dialogue boxes, the
+`switch/renut-nx/renut.toml` holds the settings you may want to change, with a comment on each: the language (by
+default the Switch's system language), MSAA and SMAA, the dynamic resolution (handheld 540p-720p, docked 540p-1080p), fur detail, 1.0.0's original font and dialogue boxes, the
 frame cap, four-core mode and the controls.
 
 ## If something goes wrong
@@ -46,7 +46,7 @@ frame cap, four-core mode and the controls.
 - Crash logs are written to `switch/renut-nx/logs/rex/rex_crash.log`.
 - For a bug report, open `renut.toml`, remove the `#` in front of `log_level = "info"`, play until the problem
   happens, and send the `switch/renut-nx/logs/` folder.
-- The page says the game or the update is not supported: renut-nx 1.0.0 supports the Xbox 360 disc release with title
+- The page says the game or the update is not supported: renut-nx 1.0.1 supports the Xbox 360 disc release with title
   update 3 only.
 
 ## How it works
