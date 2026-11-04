@@ -14,8 +14,11 @@ const ROOT = 'switch/renut-nx';  // renut-nx (2026-11-01; banjo-nx before)
 const log = (text) => postMessage({ type: 'log', text });
 // The steps' shares of the bar: the shaders take the time, the zip the bytes.
 const STEPS = { dump: [0, 0.12], glsl: [0.12, 0.55], uam: [0.55, 0.8], zip: [0.8, 1] };
+// renut-nx (2026-11-04): the console compiles the shaders, so no uam step
+const STEPS_NO_COMPILE = { dump: [0, 0.16], glsl: [0.16, 0.73], zip: [0.73, 1] };
+let steps = STEPS;
 const progress = (step) => (f) => {
-  const [a, b] = STEPS[step];
+  const [a, b] = steps[step];
   postMessage({ type: 'progress', fraction: a + (b - a) * f });
 };
 
@@ -113,6 +116,11 @@ self.onmessage = async ({ data }) => {
   const seconds = () => Math.round((performance.now() - started) / 1000);
   let workers = [];
   const stopWorkers = () => { for (const x of workers) x.w.terminate(); workers = []; };
+  // renut-nx (2026-11-04, the user's request; katamari-nx-installer's way): compile false leaves out deko3d_shaders.bin,
+  // and pipeline_list.bin with it: with that list and no cache, the prebuild workers would compile every shader in it.
+  // The NRO compiles each shader when a draw first needs it (plume loadVariant) and keeps it in a new cache file.
+  const compile = data.compile !== false;
+  if (!compile) steps = STEPS_NO_COMPILE;
   try {
     const manifest = JSON.parse(new TextDecoder().decode(await fetchBytes('./release/manifest.json')));
     const files = gameFiles(data.entries);
@@ -132,10 +140,11 @@ self.onmessage = async ({ data }) => {
     log('Downloading the program and the tools...');
     const [nro, variantsText, shaderCommon] = await Promise.all([
       fetchChecked(build.nro, build.nro_sha256),
-      fetchBytes('./release/variants.txt').then((b) => new TextDecoder().decode(b)),
+      compile ? fetchBytes('./release/variants.txt').then((b) => new TextDecoder().decode(b)) : null,
       fetchBytes('./release/shader_common.h'),
     ]);
-    const extras = await Promise.all(build.files.map(async (f) => ({ ...f, bytes: await fetchChecked(f.source, f.sha256) })));
+    const extras = await Promise.all(build.files.filter((f) => compile || f.path !== 'pipeline_list.bin')
+      .map(async (f) => ({ ...f, bytes: await fetchChecked(f.source, f.sha256) })));
     const tr = await createRenutHlslModule(quiet());
     // the shader dump's Pyodide (the GLSL workers have their own)
     const py = await loadPython(loadPyodide, new URL('./vendor/pyodide/', location.href).href,
@@ -160,20 +169,30 @@ self.onmessage = async ({ data }) => {
     if (failed) throw new Error(`${failed} shaders could not be made: ${errors.slice(0, 3).join('; ')}`);
     const glslPackage = packageShaders(shaders);
 
-    // 5: every variant the game uses, compiled for the console (and the NRO's own shaders' variants)
-    const glslOf = new Map(shaders.map((s) => [s.name, s.glsl]));
-    for (const [stem, glsl] of nroShaders(nro)) if (!glslOf.has(stem)) glslOf.set(stem, glsl);
-    const { jobs } = variantJobs(parseVariants(variantsText), glslOf);
-    log(`Compiling ${jobs.length} shader variants for the Switch on ${cores} threads...`);
-    workers = await startWorkers('./uam_worker.js', cores);
-    const { cache, failures } = await compileVariants(jobs, uamCompile(workerPool(workers)), cores * 2, progress('uam'));
-    stopWorkers();
-    if (failures.length) throw new Error(`${failures.length} shader variants did not compile: ${failures[0].error.slice(0, 200)}`);
-    const glslHash = await sha256(glslPackage), cacheHash = await sha256(cache);
-    const checked = build.deko3d_glsl_sha256 === glslHash && build.deko3d_shaders_sha256 === cacheHash;
-    log(`Shaders done in ${seconds()} s: ${shaders.length} shaders, ${jobs.length} variants` +
-        (build.deko3d_glsl_sha256 ? (checked ? ', identical to the release\'s reference build' : ' (NOT the reference build\'s: ' +
-          `${glslHash.slice(0, 12)} / ${cacheHash.slice(0, 12)})`) : ''));
+    const glslHash = await sha256(glslPackage);
+    let cache = null;
+    if (compile) {
+      // 5: every variant the game uses, compiled for the console (and the NRO's own shaders' variants)
+      const glslOf = new Map(shaders.map((s) => [s.name, s.glsl]));
+      for (const [stem, glsl] of nroShaders(nro)) if (!glslOf.has(stem)) glslOf.set(stem, glsl);
+      const { jobs } = variantJobs(parseVariants(variantsText), glslOf);
+      log(`Compiling ${jobs.length} shader variants for the Switch on ${cores} threads...`);
+      workers = await startWorkers('./uam_worker.js', cores);
+      const compiled = await compileVariants(jobs, uamCompile(workerPool(workers)), cores * 2, progress('uam'));
+      stopWorkers();
+      const { failures } = compiled;
+      if (failures.length) throw new Error(`${failures.length} shader variants did not compile: ${failures[0].error.slice(0, 200)}`);
+      cache = compiled.cache;
+      const cacheHash = await sha256(cache);
+      const checked = build.deko3d_glsl_sha256 === glslHash && build.deko3d_shaders_sha256 === cacheHash;
+      log(`Shaders done in ${seconds()} s: ${shaders.length} shaders, ${jobs.length} variants` +
+          (build.deko3d_glsl_sha256 ? (checked ? ', identical to the release\'s reference build' : ' (NOT the reference build\'s: ' +
+            `${glslHash.slice(0, 12)} / ${cacheHash.slice(0, 12)})`) : ''));
+    } else {
+      log(`Shaders done in ${seconds()} s: ${shaders.length} shaders, left for the Switch to compile` +
+          (build.deko3d_glsl_sha256 ? (build.deko3d_glsl_sha256 === glslHash ? ', identical to the release\'s reference build'
+            : ` (NOT the reference build's: ${glslHash.slice(0, 12)})`) : ''));
+    }
 
     // the zip: the program, its settings, the shaders, and the game's files
     // the update's default.xexp replaces one a folder may already have
@@ -182,7 +201,7 @@ self.onmessage = async ({ data }) => {
       { path: `${ROOT}/renut-nx.nro`, size: nro.length },
       ...extras.map((f) => ({ path: `${ROOT}/${f.path}`, size: f.bytes.length })),
       { path: `${ROOT}/deko3d_glsl.bin`, size: glslPackage.length },
-      { path: `${ROOT}/deko3d_shaders.bin`, size: cache.length },
+      ...(cache ? [{ path: `${ROOT}/deko3d_shaders.bin`, size: cache.length }] : []),
       ...game.map((f) => ({ path: `${ROOT}/game_root/${f.path}`, size: f.size })),
       ...updateFiles.map((f) => ({ path: `${ROOT}/${f.path}`, size: f.size })),
     ];
@@ -194,7 +213,7 @@ self.onmessage = async ({ data }) => {
     await zip.addBytes(entries[0].path, nro); counted(nro.length);
     for (const f of extras) { await zip.addBytes(`${ROOT}/${f.path}`, f.bytes); counted(f.bytes.length); }
     await zip.addBytes(`${ROOT}/deko3d_glsl.bin`, glslPackage); counted(glslPackage.length);
-    await zip.addBytes(`${ROOT}/deko3d_shaders.bin`, cache); counted(cache.length);
+    if (cache) { await zip.addBytes(`${ROOT}/deko3d_shaders.bin`, cache); counted(cache.length); }
     for (const f of game) {
       await zip.addFile(`${ROOT}/game_root/${f.path}`, f.size, chunks(f), (c) => counted(c.length));
     }

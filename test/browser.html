@@ -12,7 +12,8 @@
 <body>
 <!-- banjo-nx-installer: worker.js in the browser on the game folder the test server serves (python serve.py 8193 .
      --test-files <game folder>), the page's own download sink replaced by this page reading the zip from the worker's
-     port (bytes counted and the zip's end records checked, nothing saved). ?game=0 leaves the game's files out. -->
+     port (bytes counted and the zip's end records checked, nothing saved). ?game=0 leaves the game's files out, ?compile=0
+     leaves the compiling to the console. -->
 <progress id="bar" max="1" value="0"></progress>
 <div id="log"></div>
 <script type="module">
@@ -94,7 +95,8 @@ worker.onmessage = ({ data }) => {
   else if (data.type === 'error') { log(`ERROR: ${data.message}`, 'bad'); window.testDone = true; }
 };
 worker.onerror = (e) => { log(`worker error: ${e.message}`, 'bad'); window.testDone = true; };
-worker.postMessage({ entries, packages, port: channel.port1 }, [channel.port1]);
+const compile = new URLSearchParams(location.search).get('compile') !== '0';
+worker.postMessage({ entries, packages, compile, port: channel.port1 }, [channel.port1]);
 </script>
 </body>
 </html>

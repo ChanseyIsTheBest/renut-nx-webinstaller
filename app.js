@@ -199,5 +199,7 @@ create.addEventListener('click', async () => {
     log(`Error: ${event.message}`, true);
     finish();
   };
-  worker.postMessage({ entries, packages, port: channel.port1 }, [channel.port1]);
+  // renut-nx (2026-11-04): who compiles the shaders, the page or the console (worker.js)
+  const compile = document.querySelector('input[name="shaders"]:checked').value === 'page';
+  worker.postMessage({ entries, packages, compile, port: channel.port1 }, [channel.port1]);
 });

@@ -29,6 +29,14 @@
     button.primary:not(:disabled) { background: var(--primary); border-color: #5d9cf0; }
     button:disabled { background: #2a1f10; border-color: #2a1f10; color: #85745a; cursor: default; }
     input[type=file] { position: absolute; opacity: 0; width: 1px; height: 1px; }
+    fieldset { border: 0; margin: 0 0 12px; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+    legend { padding: 0; margin-bottom: 8px; font-weight: 700; }
+    .choice { display: flex; gap: 10px; align-items: flex-start; background: var(--inset); border: 1px solid var(--line);
+      border-radius: 10px; padding: 10px 14px; cursor: pointer; }
+    .choice:has(input:checked) { border-color: var(--accent); }
+    .choice input { margin: .3em 0 0; accent-color: var(--accent); flex: none; }
+    .choice span { color: var(--muted); }
+    .choice strong { color: var(--text); }
     .chosen { color: var(--muted); margin-top: 8px; }
     .detected { margin-top: 12px; background: var(--inset); border: 1px solid var(--line); border-radius: 10px; padding: 10px 14px;
       word-break: break-word; }
@@ -78,9 +86,23 @@
 
   <section>
     <h2>3. Create the package</h2>
+    <fieldset>
+      <legend>Who compiles the shaders?</legend>
+      <label class="choice">
+        <input type="radio" name="shaders" value="page" checked>
+        <span><strong>This page (recommended).</strong> The game runs at its best from the first start. Takes 20 to 40 minutes
+          and several GB of memory.</span>
+      </label>
+      <label class="choice">
+        <input type="radio" name="shaders" value="console">
+        <span><strong>The Switch, as you play (not recommended).</strong> Takes about half as long here. The game then stops
+          each time it first needs a shader, so the first start and each new area can take many minutes, and it runs slower
+          for a long time afterwards.</span>
+      </label>
+    </fieldset>
     <button id="create" class="primary" disabled>Create renut-nx.zip</button>
-    <p class="note">The page makes the game's shaders from your files and compiles them for the Switch, which takes 20 to
-      40 minutes and several GB of memory. The zip then downloads while it is written (about 7 GB).</p>
+    <p class="note">Either way the page first makes the game's shaders from your files. The zip then downloads while it is
+      written (about 7 GB).</p>
     <progress id="bar" max="1" value="0" hidden></progress>
     <div id="log" role="log" aria-live="polite"></div>
   </section>

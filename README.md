@@ -25,7 +25,8 @@ uploaded, and no game data comes with renut-nx.
 3. **Choose title update 3** (and the DLC package, at the same time, if you have it).
 4. Press **Create renut-nx.zip**. The page makes the game's shaders and compiles them for the Switch: this takes a
    while (20 to 40 minutes, depending on your computer). The zip downloads while it is made; keep the page open until it
-   finishes.
+   finishes. See [Letting the Switch compile the shaders](#letting-the-switch-compile-the-shaders) for the option that
+   is not recommended.
 5. Extract `renut-nx.zip` to the **root of the SD card**. It makes `switch/renut-nx/`.
 6. On the Switch, open **Sphaira**, find Banjo-Kazooie Nuts & Bolts, press **X** to open Options and choose
    **Install Forwarder**. Make sure **Address Space** is set to **39-bit**, choose **Create Forwarder**, then start the
@@ -34,6 +35,20 @@ uploaded, and no game data comes with renut-nx.
    The very first start also takes a few seconds longer: renut-nx compresses its shader package once.
 
 To run the page on your own computer: `python serve.py 8193 .` in this folder, then open http://127.0.0.1:8193/.
+
+### Letting the Switch compile the shaders
+
+The page's third step also offers **The Switch, as you play**, which is **not recommended**. The page still makes the
+game's shaders from your files, about half of the wait, but compiles none of them. renut-nx then compiles each shader the
+first time the game needs it and keeps the result on the SD card, so each one is compiled only once.
+
+- **The game stops while it compiles.** On an emulator, a fresh install made draws wait for over 200 compiles in its
+  first 7.5 minutes and had not reached the title screen when the test was stopped. This was not measured on a console.
+- **It runs slower for a long time.** The faster versions of the shaders (about 28,000) compile slowly in the
+  background, and the game draws with slower general versions until they are done. The picture is the same.
+
+To change to the recommended way later, make the package again with the first choice and extract it over the old folder.
+That also replaces your `renut.toml`, so keep a copy if you changed your settings.
 
 ## Settings
 
@@ -73,7 +88,9 @@ makes at runtime (no game file holds those). The page makes everything else from
    `tools/deko3d_variant_cache.py --export-variants`) plus each shader as it is (the console's fallback while a
    variant compiles), compiled by uam in WebAssembly (`wasm/uam`, the console's compiler with banjo-nx's flags) on a
    pool of workers. The NRO's own runtime shaders are read out of the NRO (`lib/nro.js`) and compiled too, so the
-   console compiles nothing.
+   console compiles nothing. If the player chooses to let the Switch compile, as katamari-nx-installer does, this step is
+   skipped and `pipeline_list.bin` is left out too: with that list and no cache, the NRO's prebuild workers would compile
+   every shader in it. Both files then build up on the SD card as the game runs.
 6. **Title update 3 and the DLC**: renut-nx is the updated game. The player also chooses title update 3's Xbox 360
    package (`TU_16L61VD_0000004000000.00000000000O1`) and, optionally, the DLC's (L.O.G.'s Lost Challenges,
    `E41F20AAF7094B9AFCA8CC90489D689D72A5062B4D`). They are read in place (`lib/stfs.js`, from keflings-nx-installer;
@@ -117,7 +134,7 @@ Node run made, so the page can say whether its own are identical.
 | `test/timing_node.mjs <banjo-nx>` | where the GLSL step's time goes |
 | `test/xiso_node.mjs <image.iso> <extracted folder>` | the disc image reader: the same files, sizes and bytes |
 | `test/full_node.mjs <game> <banjo-nx> <out>` | everything, as the page runs it, with the shader table and caches compared |
-| `test/browser.html` (with `python serve.py 8193 . --test-files <game>`) | worker.js in a browser, the zip read back |
+| `test/browser.html` (with `python serve.py 8193 . --test-files <game>`) | worker.js in a browser, the zip read back; `?compile=0` leaves the compiling to the Switch |
 
 Outputs of the tests (shader files, zips) are game data: never commit or share them.
 
