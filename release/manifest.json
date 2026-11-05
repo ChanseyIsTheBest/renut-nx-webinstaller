@@ -6,7 +6,7 @@
       "xex_sha256": "cfc2ecf323d7d8d1d6a6b871f424387f89f1136128fe0ca4f6e6e71c5838d07e",
       "xexp_sha256": "7f0363e93ea717489f817861e70403fbe0dd3be271eb97260e2f7d118bdd528c",
       "nro": "renut-nx.nro",
-      "nro_sha256": "4b146792c92515403470645eba2a0dbf31dce9e3abd2f0c8c5edc3e4133776dd",
+      "nro_sha256": "fdd75aa177e5a64e16aff4a405b40740d2585e9da4acad2a52b4df10d6b42be9",
       "files": [
         {
           "path": "renut.toml",
